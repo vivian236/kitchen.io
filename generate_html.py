@@ -36,10 +36,13 @@ def gen_head(title):
 
 
 def gen_p(text, img_src):
-    return f'''<div class="content" id="content"><p id="entry">{text}</p><img class="teaser-img" src={img_src}/></div>'''
+    return f'''<div class="content" id="content"><p id="entry">{text}</p><img class="teaser-img" src={img_src}/></div>
+    '''
 
 def gen_tail():
-    return f'''</div></body></html>'''
+    return f'''</div>
+    </body>
+    </html>'''
 
 def main_test():
 	project_id = 2294556610
