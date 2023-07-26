@@ -1,4 +1,7 @@
 from todoist_api_python.api import TodoistAPI
+import requests
+from PIL import Image
+import os
 
 with open("api.token", "r") as key_in:
 	api = TodoistAPI(str(key_in.readlines()[0].split("\n")[0]))
@@ -7,8 +10,9 @@ def get_tasks(p_id):
 	tasks=api.get_tasks()
 	tasks_out = []
 	for task in tasks:
+		imgname = task.content
 		if int(task.project_id) == p_id and task.is_completed == False:
-			tasks_out.append((task.content, get_attachment_from_comment(get_comments(task.id))))
+			tasks_out.append((task.content, get_attachment_from_comment(get_comments(task.id), imgname)))
 	return tasks_out
 			
 def get_comments(t_id):
@@ -18,10 +22,18 @@ def get_comments(t_id):
 	except Exception as error:
 		pass
 		
-def get_attachment_from_comment(comment):
+def get_attachment_from_comment(comment, imgname):
 	try:
-		return comment.attachment.file_url
+		iurl = comment.attachment.image
+		fattach = iurl.split(".")[-1]
+		ifp = "img/" + imgname + "." + fattach
+		if not os.path.isfile(ifp):
+			with open(ifp, "wb") as img_out:
+				img_out.write(requests.get(iurl).content)
+		return ifp
+
 	except Exception as error:
+		print(error)
 		pass
 
 def gen_head(title): 
@@ -36,7 +48,7 @@ def gen_head(title):
 
 
 def gen_p(text, img_src):
-    return f'''<div class="content" id="content"><p id="entry">{text}</p><img class="teaser-img" src={img_src}/></div>
+    return f'''<div class="content" id="content"><p id="entry">{text}</p><img class="teaser-img" src={img_src}></div>
     '''
 
 def gen_tail():
